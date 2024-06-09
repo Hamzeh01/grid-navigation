@@ -3,11 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>Shortest Path Finder</title>
-    <style>
-      #gridCanvas {
-        border: 1px solid black;
-      }
-    </style>
   </head>
   <body>
     <h1>Shortest Path Finder</h1>
@@ -24,14 +19,12 @@
       <input type="number" id="endY" required /><br /><br />
       <label for="algorithm">Select Algorithm:</label>
       <select id="algorithm" required>
-        <option value="gbfs">GBFS</option>
         <option value="astar">A*</option></select
       ><br /><br />
       <button type="submit">Find Path</button>
     </form>
     <h2>Output</h2>
     <p id="output"></p>
-    <canvas id="gridCanvas" width="1024" height="1024"></canvas>
 
     <script>
       document
@@ -43,153 +36,190 @@
           const startY = parseInt(document.getElementById("startY").value);
           const endX = parseInt(document.getElementById("endX").value);
           const endY = parseInt(document.getElementById("endY").value);
-          const algorithm = document.getElementById("algorithm").value;
 
           if (fileInput) {
             const reader = new FileReader();
             reader.onload = function (e) {
               const grid = e.target.result
                 .split("\n")
-                .map((line) => line.split(""));
-              if (algorithm === "gbfs") {
-                findPathGBFS(grid, startX, startY, endX, endY);
-              } else {
-                findPathAStar(grid, startX, startY, endX, endY);
-              }
+                .map((line) =>
+                  line.split("").map((char) => (char === "." ? 1 : 0))
+                );
+              aStarSearch(grid, [startX, startY], [endX, endY]);
             };
             reader.readAsText(fileInput);
           }
         });
 
-      function findPathGBFS(grid, startX, startY, endX, endY) {
-        const startTime = performance.now();
-        const path = searchPath(
-          grid,
-          startX,
-          startY,
-          endX,
-          endY,
-          heuristicGBFS
-        );
-        const endTime = performance.now();
-        displayOutput(path, endTime - startTime);
-        drawGrid(grid, path);
+      // A javascript Program to implement A* Search Algorithm
+      class cell {
+        constructor() {
+          this.parent_i = 0;
+          this.parent_j = 0;
+          this.f = 0;
+          this.g = 0;
+          this.h = 0;
+        }
       }
 
-      function findPathAStar(grid, startX, startY, endX, endY) {
-        const startTime = performance.now();
-        const path = searchPath(
-          grid,
-          startX,
-          startY,
-          endX,
-          endY,
-          heuristicAStar
+      function isValid(grid, row, col) {
+        return (
+          row >= 0 && row < grid.length && col >= 0 && col < grid[0].length
         );
-        const endTime = performance.now();
-        displayOutput(path, endTime - startTime);
-        drawGrid(grid, path);
       }
 
-      function searchPath(grid, startX, startY, endX, endY, heuristic) {
-        const directions = [
-          [0, 1],
-          [1, 0],
-          [0, -1],
-          [-1, 0],
-        ];
-        const priorityQueue = [{ x: startX, y: startY, cost: 0 }];
-        const visited = new Set();
-        visited.add(`${startX},${startY}`);
-        const cameFrom = {};
-        const costSoFar = {};
-        costSoFar[`${startX},${startY}`] = 0;
+      function isUnBlocked(grid, row, col) {
+        return grid[row][col] == 1;
+      }
 
-        while (priorityQueue.length > 0) {
-          priorityQueue.sort((a, b) => a.cost - b.cost);
-          const current = priorityQueue.shift();
+      function isDestination(row, col, dest) {
+        return row == dest[1] && col == dest[0];
+      }
 
-          if (current.x === endX && current.y === endY) {
-            return reconstructPath(cameFrom, startX, startY, endX, endY);
-          }
+      function calculateHValue(row, col, dest) {
+        return Math.abs(row - dest[1]) + Math.abs(col - dest[0]);
+      }
 
-          for (const [dx, dy] of directions) {
-            const newX = current.x + dx;
-            const newY = current.y + dy;
-            const newKey = `${newX},${newY}`;
+      function tracePath(cellDetails, dest) {
+        let row = dest[1];
+        let col = dest[0];
+        let Path = [];
 
-            if (isValid(grid, newX, newY) && !visited.has(newKey)) {
-              const newCost = costSoFar[`${current.x},${current.y}`] + 1;
-              costSoFar[newKey] = newCost;
-              const priority = newCost + heuristic(newX, newY, endX, endY);
-              priorityQueue.push({ x: newX, y: newY, cost: priority });
-              visited.add(newKey);
-              cameFrom[newKey] = `${current.x},${current.y}`;
+        while (
+          !(
+            cellDetails[row][col].parent_i == row &&
+            cellDetails[row][col].parent_j == col
+          )
+        ) {
+          Path.push([col, row]);
+          let temp_row = cellDetails[row][col].parent_i;
+          let temp_col = cellDetails[row][col].parent_j;
+          row = temp_row;
+          col = temp_col;
+        }
+
+        Path.push([col, row]);
+        Path.reverse();
+
+        let pathStr = Path.map((p) => `(${p[0]}, ${p[1]})`).join(" -> ");
+        return pathStr;
+      }
+
+      function aStarSearch(grid, src, dest) {
+        const startTime = performance.now();
+        if (!isValid(grid, src[1], src[0])) {
+          document.getElementById("output").innerText = "Source is invalid.";
+          return;
+        }
+
+        if (!isValid(grid, dest[1], dest[0])) {
+          document.getElementById("output").innerText =
+            "Destination is invalid.";
+          return;
+        }
+
+        if (
+          !isUnBlocked(grid, src[1], src[0]) ||
+          !isUnBlocked(grid, dest[1], dest[0])
+        ) {
+          document.getElementById("output").innerText =
+            "Source or the destination is blocked.";
+          return;
+        }
+
+        if (isDestination(src[1], src[0], dest)) {
+          document.getElementById("output").innerText =
+            "We are already at the destination.";
+          return;
+        }
+
+        let ROW = grid.length;
+        let COL = grid[0].length;
+        let closedList = new Array(ROW)
+          .fill(false)
+          .map(() => new Array(COL).fill(false));
+
+        let cellDetails = new Array(ROW)
+          .fill(null)
+          .map(() => new Array(COL).fill(null).map(() => new cell()));
+
+        let i = src[1],
+          j = src[0];
+        cellDetails[i][j].f = 0.0;
+        cellDetails[i][j].g = 0.0;
+        cellDetails[i][j].h = 0.0;
+        cellDetails[i][j].parent_i = i;
+        cellDetails[i][j].parent_j = j;
+
+        let openList = new Map();
+        openList.set(0.0, [i, j]);
+
+        let foundDest = false;
+
+        while (openList.size > 0) {
+          let p = openList.entries().next().value;
+          openList.delete(p[0]);
+
+          i = p[1][0];
+          j = p[1][1];
+          closedList[i][j] = true;
+
+          let gNew, hNew, fNew;
+          let directions = [
+            [-1, 0],
+            [1, 0],
+            [0, 1],
+            [0, -1],
+            [-1, 1],
+            [-1, -1],
+            [1, 1],
+            [1, -1],
+          ];
+
+          for (let d of directions) {
+            let newRow = i + d[0];
+            let newCol = j + d[1];
+
+            if (isValid(grid, newRow, newCol)) {
+              if (isDestination(newRow, newCol, dest)) {
+                cellDetails[newRow][newCol].parent_i = i;
+                cellDetails[newRow][newCol].parent_j = j;
+                let path = tracePath(cellDetails, dest);
+                const endTime = performance.now();
+                document.getElementById(
+                  "output"
+                ).innerText = `Path: ${path}\nCost: ${
+                  path.split(" -> ").length - 1
+                }\nRuntime: ${(endTime - startTime).toFixed(2)} ms`;
+                foundDest = true;
+                return;
+              } else if (
+                !closedList[newRow][newCol] &&
+                isUnBlocked(grid, newRow, newCol)
+              ) {
+                gNew = cellDetails[i][j].g + 1.0;
+                hNew = calculateHValue(newRow, newCol, dest);
+                fNew = gNew + hNew;
+
+                if (
+                  cellDetails[newRow][newCol].f == 0 ||
+                  cellDetails[newRow][newCol].f > fNew
+                ) {
+                  openList.set(fNew, [newRow, newCol]);
+                  cellDetails[newRow][newCol].f = fNew;
+                  cellDetails[newRow][newCol].g = gNew;
+                  cellDetails[newRow][newCol].h = hNew;
+                  cellDetails[newRow][newCol].parent_i = i;
+                  cellDetails[newRow][newCol].parent_j = j;
+                }
+              }
             }
           }
         }
-        return null;
-      }
 
-      function heuristicGBFS(x, y, endX, endY) {
-        return Math.abs(x - endX) + Math.abs(y - endY);
-      }
-
-      function heuristicAStar(x, y, endX, endY) {
-        return Math.abs(x - endX) + Math.abs(y - endY);
-      }
-
-      function isValid(grid, x, y) {
-        return (
-          x >= 0 &&
-          y >= 0 &&
-          x < grid.length &&
-          y < grid[0].length &&
-          grid[x][y] === "."
-        );
-      }
-
-      function reconstructPath(cameFrom, startX, startY, endX, endY) {
-        let current = `${endX},${endY}`;
-        const path = [];
-        while (current !== `${startX},${startY}`) {
-          path.push(current);
-          current = cameFrom[current];
-        }
-        path.push(`${startX},${startY}`);
-        return path.reverse();
-      }
-
-      function displayOutput(path, runtime) {
-        if (path) {
-          document.getElementById("output").innerText = `Path found with cost ${
-            path.length - 1
-          } in ${runtime.toFixed(2)} ms.`;
-        } else {
-          document.getElementById("output").innerText = "No path found.";
-        }
-      }
-
-      function drawGrid(grid, path) {
-        const canvas = document.getElementById("gridCanvas");
-        const ctx = canvas.getContext("2d");
-        const scale = canvas.width / grid.length;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        for (let x = 0; x < grid.length; x++) {
-          for (let y = 0; y < grid[x].length; y++) {
-            ctx.fillStyle = grid[x][y] === "." ? "#ffffff" : "#000000";
-            ctx.fillRect(y * scale, x * scale, scale, scale);
-          }
-        }
-
-        if (path) {
-          ctx.fillStyle = "#ff0000";
-          for (const p of path) {
-            const [x, y] = p.split(",").map(Number);
-            ctx.fillRect(y * scale, x * scale, scale, scale);
-          }
+        if (!foundDest) {
+          document.getElementById("output").innerText =
+            "Failed to find the destination cell.";
         }
       }
     </script>
