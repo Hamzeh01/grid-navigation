@@ -1,0 +1,141 @@
+/* style.css */
+:root {
+    --font-family: Arial, sans-serif;
+    --background-color-light: #ffffff;
+    --container-bg-color-light: #f0f0f0;
+    --text-color-light: #333333;
+    --button-bg-color-light: #007BFF;
+    --button-hover-bg-color-light: #0056b3;
+    --button-text-color-light: #ffffff;
+    --shadow-light: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.2);
+  
+    --background-color-dark: #121212;
+    --container-bg-color-dark: #1e1e1e;
+    --text-color-dark: #e0e0e0;
+    --button-bg-color-dark: #ff5722;
+    --button-hover-bg-color-dark: #e64a19;
+    --button-text-color-dark: #ffffff;
+    --shadow-dark: 0 0.125rem 0.625rem rgba(255, 255, 255, 0.2);
+  
+    --border-radius: 0.5rem;
+    --padding: 1rem;
+    --margin: 1rem;
+    --transition-duration: 0.3s;
+}
+
+body.light-mode {
+    --background-color: var(--background-color-light);
+    --container-bg-color: var(--container-bg-color-light);
+    --text-color: var(--text-color-light);
+    --button-bg-color: var(--button-bg-color-light);
+    --button-hover-bg-color: var(--button-hover-bg-color-light);
+    --button-text-color: var(--button-text-color-light);
+    --shadow: var(--shadow-light);
+}
+
+body.dark-mode {
+    --background-color: var(--background-color-dark);
+    --container-bg-color: var(--container-bg-color-dark);
+    --text-color: var(--text-color-dark);
+    --button-bg-color: var(--button-bg-color-dark);
+    --button-hover-bg-color: var(--button-hover-bg-color-dark);
+    --button-text-color: var(--button-text-color-dark);
+    --shadow: var(--shadow-dark);
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: var(--container-bg-color);
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 31.25rem;
+    text-align: center;
+    transition: transform var(--transition-duration);
+}
+
+.container:hover {
+    transform: scale(1.05);
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: var(--margin);
+}
+
+label {
+    display: block;
+    margin: 0.5rem 0 0.25rem;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: var(--margin);
+    border-radius: 0.25rem;
+    border: 0.0625rem solid #ccc;
+    font-size: 1rem;
+}
+
+button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-duration), transform var(--transition-duration);
+    will-change: transform;
+}
+
+button:hover {
+    background-color: var(--button-hover-bg-color);
+    transform: translateY(0.15rem);
+}
+
+.result {
+    background-color: var(--container-bg-color);
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    margin-top: var(--margin);
+    border: 0.0625rem solid #333;
+    opacity: 0;
+    transition: opacity var(--transition-duration);
+}
+
+.result.visible {
+    opacity: 1;
+}
+
+.switch {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.switch input {
+    display: none;
+}
+
+.switch label {
+    background-color: var(--container-bg-color);
+    border-radius: var(--border-radius);
+    border: 0.0625rem solid #ccc;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    transition: background-color var(--transition-duration);
+}
+
+.switch label:hover {
+    background-color: var(--button-hover-bg-color);
+}
