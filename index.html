@@ -1,32 +1,29 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>City Path Finder</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="script.js" defer></script>
-  </head>
-  <body class="light-mode">
-    <div class="switch">
-      <input type="checkbox" id="theme-switch" />
-      <label for="theme-switch">Enable Dark Mode</label>
-    </div>
-    <div class="container">
-      <h1>City Path Finder</h1>
-      <label for="file-input">Upload Grid File:</label>
-      <input type="file" id="file-input" />
-      <label for="start-coord">Start Coordinate (x,y):</label>
-      <input type="text" id="start-coord" placeholder="e.g., 0,0" />
-      <label for="goal-coord">Goal Coordinate (x,y):</label>
-      <input type="text" id="goal-coord" placeholder="e.g., 1023,1023" />
-      <label for="algorithm">Select Algorithm:</label>
-      <select id="algorithm">
-        <option value="a_star">A*</option>
-        <option value="gbfs">GBFS</option>
-      </select>
-      <button onclick="findPath()">Find Path</button>
-      <div class="result" id="result"></div>
-    </div>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinding Web App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Pathfinding Web App</h1>
+    <form id="pathfinding-form">
+        <label for="file">Upload grid file:</label>
+        <input type="file" id="file" name="file" required><br><br>
+        <label for="start">Start (x,y):</label>
+        <input type="text" id="start" name="start" placeholder="e.g., 0,0" required><br><br>
+        <label for="target">Target (x,y):</label>
+        <input type="text" id="target" name="target" placeholder="e.g., 1023,1023" required><br><br>
+        <label for="algorithm">Select algorithm:</label>
+        <select id="algorithm" name="algorithm">
+            <option value="gbfs">GBFS</option>
+            <option value="astar">A*</option>
+        </select><br><br>
+        <button type="submit">Find Path</button>
+    </form>
+    <div id="result"></div>
+    <script src="script.js"></script>
+</body>
 </html>
